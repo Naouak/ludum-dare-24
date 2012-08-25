@@ -36,21 +36,26 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get("/counter", routes.counter);
 app.get("/reset", routes.reset);
+app.get("/connected", routes.connected);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
 var io = require("socket.io").listen(server);
+var users = require("./application/lib/user.js");
 
 io.of("/socket").on("connection",function(socket){
 	var f = function(){
 		socket.emit("reset");
 	};
 
+	users.stats.newUser();
+
 	counter.event.on("reset",f);
 
 	socket.on("disconnect", function(){
 		counter.event.removeListener("reset",f);
+		users.stats.removeUser();
 	});
 });

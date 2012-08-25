@@ -17,3 +17,8 @@ exports.reset = function(req,res){
 	counter.reset();
 	res.end("1");
 }
+
+var user = require("../lib/user.js");
+exports.connected = function(req,res){
+	res.end(user.stats.getCount().toString());
+}
