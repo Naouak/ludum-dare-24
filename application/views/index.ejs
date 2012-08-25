@@ -4,6 +4,7 @@
 	<title><%= title %></title>
 	<link rel='stylesheet' href='/stylesheets/style.css' />
 	<script src="http://yui.yahooapis.com/3.6.0/build/yui/yui-min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 	<h1><%= title %></h1>
@@ -16,6 +17,8 @@
 
 	<script type="text/javascript">
 		YUI().use("base-build", "io", "yui-later", "widget", "node", function (Y) {
+			var socket = io.connect('/socket');
+
 			var Counter = Y.Base.create("ld-counter", Y.Widget, [], {
 						renderUI:function () {
 
@@ -26,6 +29,8 @@
 
 							var repeater = Y.later(500, this, this.updateTime, [], true);
 							this.set("repeater", repeater);
+
+							socket.on("reset", Y.bind(this.updateFromServer,this));
 						},
 						syncUI:function () {
 							this.updateFromServer();
@@ -109,12 +114,9 @@
 
 	</script>
 
-	<script src="/socket.io/socket.io.js"></script>
+
 	<script>
-		var socket = io.connect('/socket');
-		socket.on('reset', function (data) {
-			alert("bam!");
-		});
+
 	</script>
 
 </body>
