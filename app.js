@@ -8,8 +8,11 @@ var express = require('express')
   , http = require('http')
   , path = require('path');
 
-var app = express(),
-	io = require("socket.io").listen(app);
+var app = express();
+
+var counter = require("./application/lib/counter.js").counter;
+
+
 
 app.configure(function(){
   app.set('port', process.env.PORT || 8080);
@@ -34,6 +37,20 @@ app.get('/', routes.index);
 app.get("/counter", routes.counter);
 app.get("/reset", routes.reset);
 
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
+});
+
+var io = require("socket.io").listen(server);
+
+io.of("/socket").on("connection",function(socket){
+	var f = function(){
+		socket.emit("reset");
+	};
+
+	counter.event.on("reset",f);
+
+	socket.on("disconnect", function(){
+		counter.event.removeListener("reset",f);
+	});
 });
