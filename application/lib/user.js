@@ -17,9 +17,6 @@ exports.stats = new userStats();
 var crypto = require("crypto"),
 	shasum = crypto.createHash("sha1");
 
-
-
-
 var user = function(n,p){
 	var name = n;
 	var password = p;
@@ -52,4 +49,10 @@ var userFactory = function(){
 	this.createUser = function(name,password){
 		users[name] = new User(name,this.hashPassword(password));
 	};
+
+	this.isConnected = function(req){
+		return req.session.username !== undefined;
+	};
 }
+
+exports.users = new userFactory();

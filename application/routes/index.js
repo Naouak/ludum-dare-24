@@ -3,10 +3,10 @@
  * GET home page.
  */
 var counter = require("../lib/counter.js").counter;
-
+var user = require("../lib/user.js");
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Naouak\'s Ludum dare 24' });
+  res.render('index', { title: 'Naouak\'s Ludum dare 24', connected: user.users.isConnected(req) });
 };
 
 exports.counter = function(req,res){
@@ -14,11 +14,15 @@ exports.counter = function(req,res){
 }
 
 exports.reset = function(req,res){
-	counter.reset();
-	res.end("1");
+	if(user.users.isConnected(req)){
+		counter.reset();
+		res.end("1");
+	}
+	else{
+		res.end("0");
+	}
 }
 
-var user = require("../lib/user.js");
 exports.connected = function(req,res){
 	res.end(user.stats.getCount().toString());
 }
@@ -33,8 +37,20 @@ exports.sessionstart = function(req,res){
 }
 
 exports.login = function(req,res){
-	var user = req.body.user;
+	var username = req.body.user;
 	var password = req.body.password;
-
-
+	var o = user.users.getUserByName(username);
+	if(o !== undefined && o.testPassword(password)){
+		//connection successful
+		req.session.user = username;
+		res.render("success");
+	}
+	else if(o !== undefined){
+		res.render("wrong");
+	}
+	else{
+		user.users.addUser(username,password);
+		req.session.user = username;
+		res.render("success");
+	}
 }
