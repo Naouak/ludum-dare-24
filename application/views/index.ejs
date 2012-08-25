@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title><%= title %></title>
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+	<script src="http://yui.yahooapis.com/3.6.0/build/yui/yui-min.js"></script>
+</head>
+<body>
+	<h1><%= title %></h1>
+
+	<div class="counter">
+
+	</div>
+
+	<div class="reset-button"></div>
+
+	<script type="text/javascript">
+		YUI().use("base-build", "io", "yui-later", "widget", "node", function (Y) {
+			var Counter = Y.Base.create("ld-counter", Y.Widget, [], {
+						renderUI:function () {
+
+						},
+						bindUI:function () {
+							this.on("baseChange", this.baseChange, this);
+
+
+							var repeater = Y.later(500, this, this.updateTime, [], true);
+							this.set("repeater", repeater);
+						},
+						syncUI:function () {
+							this.updateFromServer();
+						},
+						updateTime:function () {
+							var content = this.get("contentBox");
+
+							if (new Date() - this.get("startTime") > 30000) {
+								this.updateFromServer();
+							}
+
+							var time = Math.round(this.get("base") + (new Date() - this.get("startTime")) / 1000);
+
+							content.setContent(time);
+						},
+						updateFromServer:function () {
+							Y.io("/counter", {
+								on:{
+									success:Y.bind(function (id, o, args) {
+										this.set("base", parseInt(o.responseText));
+									}, this)
+								}
+							});
+						},
+						baseChange:function () {
+							this.set("startTime", new Date());
+						}
+					},{
+						ATTRS:{
+							base:{
+								value:0
+							},
+							startTime:{
+								value:new Date()
+							},
+							repeater:{
+								value:null
+							}
+
+						}
+					});
+			var cc = new Counter();
+			cc.render(".counter");
+
+			var ResetButton = Y.Base.create("ld-resetButton", Y.Widget, [], {
+				renderUI:function () {
+					var n = this.get("contentBox");
+
+					this.button = Y.Node.create("<button>Push me, I'm famous</button>");
+
+					n.append(this.button);
+				},
+				bindUI:function () {
+					this.button.on("click", this.reset, this);
+				},
+				syncUI:function () {
+
+				},
+				reset:function () {
+					Y.io("/reset", {
+						on:{
+							success:Y.bind(function (id, o, args) {
+								if (o.responseText == '1') {
+
+								}
+								else {
+
+								}
+							}, this)
+						}
+					});
+				}
+			}, {
+				ATTRS:{
+
+				}
+			});
+			var rb = new ResetButton();
+			rb.render(".reset-button");
+		});
+	</script>
+
+</body>
+</html>
