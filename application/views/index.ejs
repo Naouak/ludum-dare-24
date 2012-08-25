@@ -9,6 +9,27 @@
 <body>
 	<h1><%= title %></h1>
 
+	<% if(connected){ %>
+		<p>Logged in as <%=user.getName()%></p>
+	<% } else { %>
+	<p>
+		To access my entry, I need a way to know who you are. Just enter a username and a password to get an account.
+		This account will only be used for this game and nothing else. Password are hashed before being stocked.
+		Please avoid to use a password that you use on another site. Even though I can't have access to them directly,
+		this game was coded in less that 48 hours and so they may be some security problems.
+		Keep in mind that this password just serve to be the only one connecting to your account.
+	</p>
+	<form action="/login" method="post">
+		<fieldset>
+			<legend>Login / Sign up</legend>
+			<label>Username <input type="text" name="username" placeholder="Username"></label>
+			<label>Password <input type="password" name="password" placeholder="Password"></label>
+			<button>Login / Sign up</button>
+		</fieldset>
+	</form>
+	<% } %>
+
+
 	<div class="application">
 		<div class="counter"></div>
 
@@ -113,11 +134,5 @@
 		});
 
 	</script>
-
-
-	<script>
-
-	</script>
-
 </body>
 </html>

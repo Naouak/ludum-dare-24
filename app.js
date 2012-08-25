@@ -39,6 +39,7 @@ app.get("/reset", routes.reset);
 app.get("/connected", routes.connected);
 app.get("/session", routes.session);
 app.get("/sessionstart", routes.sessionstart);
+app.post("/login", routes.login);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
@@ -51,11 +52,8 @@ io.of("/socket").on("connection",function(socket){
 	var f = function(){
 		socket.emit("reset");
 	};
-
 	users.stats.newUser();
-
 	counter.event.on("reset",f);
-
 	socket.on("disconnect", function(){
 		counter.event.removeListener("reset",f);
 		users.stats.removeUser();

@@ -6,7 +6,11 @@ var counter = require("../lib/counter.js").counter;
 var user = require("../lib/user.js");
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Naouak\'s Ludum dare 24', connected: user.users.isConnected(req) });
+  res.render('index', {
+	  title: 'Naouak\'s Ludum dare 24',
+	  connected: user.users.isConnected(req),
+	  user: user.users.getCurrentUser(req)
+  });
 };
 
 exports.counter = function(req,res){
@@ -37,20 +41,21 @@ exports.sessionstart = function(req,res){
 }
 
 exports.login = function(req,res){
-	var username = req.body.user;
+	var username = req.body.username;
 	var password = req.body.password;
 	var o = user.users.getUserByName(username);
+	if(o === undefined){
+		user.users.createUser(username,password);
+		o =  user.users.getUserByName(username);
+	}
+
 	if(o !== undefined && o.testPassword(password)){
 		//connection successful
 		req.session.user = username;
-		res.render("success");
+		res.redirect("/");
+		res.end();
 	}
-	else if(o !== undefined){
-		res.render("wrong");
-	}
-	else{
-		user.users.addUser(username,password);
-		req.session.user = username;
-		res.render("success");
+	else {
+		res.render("Something went wrong. Wrong password I guess.");
 	}
 }
